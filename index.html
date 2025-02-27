@@ -26,6 +26,12 @@
             margin-top: 20px;
         }
 
+        #objective-text {
+            font-size: 18px;
+            color: #ff5722;
+            margin-top: 10px;
+        }
+
         #game-container {
             display: flex;
             justify-content: center;
@@ -113,25 +119,33 @@
             }
         }
 
+        .winner {
+            color: green;
+            font-size: 36px;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
     <h1>Dominó Matemático</h1>
-    <h2>Pontuação: <span id="score">0</span></h2>
-
+    <h2>Pontuação: <span id="score">0</span> / 1000</h2>
+    <p id="objective-text">Objetivo: Acertar as contas e atingir 1000 pontos sem errar!</p>
     <div id="game-container">
         <div id="drop-zone"></div>
     </div>
-
     <div id="pieces-container">
         <div id="pieces"></div>
     </div>
+    <div id="winner-message"></div>
 
     <script>
         let score = 0;
+        let isGameOver = false;
         const scoreDisplay = document.getElementById("score");
         const dropZone = document.getElementById("drop-zone");
         const piecesContainer = document.getElementById("pieces");
+        const winnerMessage = document.getElementById("winner-message");
 
         const dominoes = [
             { conta: "2³", resposta: "8" },
@@ -211,7 +225,11 @@
                 score += 100;
                 dropZone.style.background = "lightgreen";
                 setTimeout(() => {
-                    nextQuestion(); // Gera uma nova pergunta
+                    if (score >= 1000) {
+                        gameOver(true); // Vitória quando alcançar 1000 pontos
+                    } else {
+                        nextQuestion(); // Gera uma nova pergunta
+                    }
                 }, 1000);
             } else {
                 score -= 50;
@@ -220,8 +238,9 @@
                 setTimeout(() => {
                     piece.classList.remove("broken");
                 }, 500);
+                if (score < 0) score = 0;
+                scoreDisplay.textContent = score;
             }
-            scoreDisplay.textContent = score;
         }
 
         function nextQuestion() {
@@ -231,16 +250,16 @@
             createPieces(); // Cria as peças para a nova pergunta
         }
 
-        dropZone.addEventListener("dragover", (e) => e.preventDefault());
+        function gameOver(win) {
+            isGameOver = true;
+            if (win) {
+                winnerMessage.textContent = "Parabéns! Você atingiu 1000 pontos!";
+            } else {
+                winnerMessage.textContent = "Game Over! Você errou uma vez.";
+            }
+        }
 
-        dropZone.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const droppedValue = e.dataTransfer.getData("text");
-            const piece = document.querySelector(`.piece:contains('${droppedValue}')`);
-            checkDrop(piece, droppedValue);
-        });
-
-        createPieces(); // Inicializa o jogo
+        createPieces(); // Inicia o jogo
     </script>
 </body>
 </html>
