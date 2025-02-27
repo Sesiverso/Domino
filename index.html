@@ -209,7 +209,9 @@
             if (droppedValue === selectedDomino.resposta) {
                 score += 100;
                 dropZone.style.background = "lightgreen";
-                setTimeout(() => location.reload(), 1000);
+                setTimeout(() => {
+                    nextQuestion(); // Gera uma nova pergunta
+                }, 1000);
             } else {
                 score -= 50;
                 dropZone.style.background = "red";
@@ -221,6 +223,13 @@
             scoreDisplay.textContent = score;
         }
 
+        function nextQuestion() {
+            // Seleciona uma nova pergunta
+            selectedDomino = dominoes[Math.floor(Math.random() * dominoes.length)];
+            dropZone.textContent = selectedDomino.conta;
+            createPieces(); // Cria as peças para a nova pergunta
+        }
+
         dropZone.addEventListener("dragover", (e) => e.preventDefault());
 
         dropZone.addEventListener("drop", (e) => {
@@ -230,7 +239,7 @@
             checkDrop(piece, droppedValue);
         });
 
-        createPieces();
+        createPieces(); // Inicializa o jogo
     </script>
 </body>
 </html>
