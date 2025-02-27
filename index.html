@@ -89,6 +89,7 @@
                 // Eventos de Drag and Drop
                 piece.addEventListener("dragstart", (e) => {
                     e.dataTransfer.setData("text", domino.resposta);
+                    e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
                 });
 
                 // Suporte para toque (touch)
@@ -120,7 +121,7 @@
                             pieceRect.top > dropRect.top &&
                             pieceRect.bottom < dropRect.bottom
                         ) {
-                            checkDrop(piece, domino.resposta);
+                            checkDrop(piece, piece.textContent);
                         }
 
                         document.removeEventListener("touchmove", onTouchMove);
@@ -136,8 +137,8 @@
             });
         }
 
-        function checkDrop(piece, value) {
-            if (value === selectedDomino.resposta) {
+        function checkDrop(piece, droppedValue) {
+            if (droppedValue === selectedDomino.resposta) {
                 score += 100;
                 dropZone.style.background = "lightgreen";
                 setTimeout(() => location.reload(), 1000);
