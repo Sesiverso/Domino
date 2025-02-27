@@ -3,58 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominó Matemático</title>
+    <title>Dominó Matemático - Festa!</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; background: #f4f4f4; }
-        #game-container { display: flex; justify-content: center; margin-top: 50px; position: relative; height: 200px; }
-        #drop-zone { width: 140px; height: 70px; border: 2px dashed #333; display: flex; align-items: center; justify-content: center; font-size: 22px; background: white; font-weight: bold; position: absolute; top: 50%; transform: translateY(-50%); }
-        
-        #pieces-container { 
-            width: 100%; 
-            overflow-x: auto; 
-            white-space: nowrap; 
-            padding: 10px;
-            background: #ddd;
+        body {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            color: #fff;
+            padding: 0;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-top: 50px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
             margin-top: 20px;
         }
-        
-        #pieces { 
-            display: flex; 
-            gap: 10px; 
-            justify-content: start; 
-            flex-wrap: nowrap; 
+
+        #game-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            position: relative;
+            height: 200px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background: #ffcc00;
+            border-radius: 15px;
+        }
+
+        #drop-zone {
+            width: 150px;
+            height: 80px;
+            border: 4px dashed #ffeb3b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: #ff5722;
+            font-weight: bold;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #pieces-container {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px;
+            background: #ff4081;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #pieces {
+            display: flex;
+            gap: 10px;
+            justify-content: start;
+            flex-wrap: nowrap;
             padding: 10px;
         }
 
-        .piece { 
-            width: 120px; height: 60px; 
-            background: white; 
-            border: 2px solid #333; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 20px; 
-            cursor: grab; 
+        .piece {
+            width: 120px;
+            height: 60px;
+            background: #ffffff;
+            border: 2px solid #ff5722;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: grab;
             font-weight: bold;
-            touch-action: none; /* Melhora o touch */
+            background-color: #ffeb3b;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
         }
 
-        .broken { animation: breakPiece 0.5s; }
+        .piece:hover {
+            transform: scale(1.1);
+        }
+
+        .broken {
+            animation: breakPiece 0.5s;
+        }
+
         @keyframes breakPiece {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.5; }
-            100% { transform: scale(0); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Confete animado */
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            background-color: rgba(255, 255, 255, 0.5);
+            animation: confetti 2s linear infinite;
+        }
+
+        @keyframes confetti {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Dominó Matemático</h1>
+    <h1>Festa do Dominó Matemático!</h1>
     <h2>Pontuação: <span id="score">0</span></h2>
-    
+
+    <!-- Confetes animados -->
+    <div class="confetti"></div>
+
     <div id="game-container">
         <div id="drop-zone"></div>
     </div>
-    
+
     <div id="pieces-container">
         <div id="pieces"></div>
     </div>
