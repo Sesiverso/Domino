@@ -148,6 +148,7 @@
         dropZone.textContent = selectedDomino.conta;
 
         function createPieces() {
+            piecesContainer.innerHTML = ''; // Limpa as peças antigas
             dominoes.forEach(domino => {
                 const piece = document.createElement("div");
                 piece.classList.add("piece");
