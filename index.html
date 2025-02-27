@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominó Matemático - Ensino Fundamental II</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #f4f4f4; }
+        #game-container { display: flex; justify-content: center; margin-top: 50px; }
+        #drop-zone { width: 140px; height: 70px; border: 2px dashed #333; display: flex; align-items: center; justify-content: center; font-size: 22px; background: white; font-weight: bold; }
+        #pieces { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+        .piece { width: 120px; height: 60px; background: white; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: grab; font-weight: bold; }
+        .broken { animation: breakPiece 0.5s; }
+        @keyframes breakPiece {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dominó Matemático</h1>
+    <h2>Pontuação: <span id="score">0</span></h2>
+    <div id="game-container">
+        <div id="drop-zone"></div>
+    </div>
+    <div id="pieces"></div>
+
+    <script>
+        let score = 0;
+        const scoreDisplay = document.getElementById("score");
+        const dropZone = document.getElementById("drop-zone");
+        const piecesContainer = document.getElementById("pieces");
+
+        const dominoes = [
+            { conta: "2³", resposta: "8" },
+            { conta: "√49", resposta: "7" },
+            { conta: "3 × (5 - 2)", resposta: "9" },
+            { conta: "1/2 + 1/4", resposta: "3/4" },
+            { conta: "15 ÷ 3 + 2", resposta: "7" },
+            { conta: "5² - 4²", resposta: "9" },
+            { conta: "6 + 2 × 3", resposta: "12" },
+            { conta: "(10 ÷ 2) + (3 × 3)", resposta: "14" }
+        ];
+
+        let selectedDomino = dominoes[Math.floor(Math.random() * dominoes.length)];
+        dropZone.textContent = selectedDomino.conta;
+
+        function createPieces() {
+            dominoes.forEach(domino => {
+                const piece = document.createElement("div");
+                piece.classList.add("piece");
+                piece.textContent = domino.resposta;
+                piece.draggable = true;
+                piece.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text", domino.resposta);
+                });
+                piecesContainer.appendChild(piece);
+            });
+        }
+
+        dropZone.addEventListener("dragover", (e) => e.preventDefault());
+
+        dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const droppedValue = e.dataTransfer.getData("text");
+            if (droppedValue === selectedDomino.resposta) {
+                score += 100;
+                dropZone.style.background = "lightgreen";
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                score -= 50;
+                dropZone.style.background = "red";
+                let draggedPiece = document.querySelector(`.piece:contains('${droppedValue}')`);
+                if (draggedPiece) {
+                    draggedPiece.classList.add("broken");
+                    setTimeout(() => {
+                        draggedPiece.classList.remove("broken");
+                    }, 500);
+                }
+            }
+            scoreDisplay.textContent = score;
+        });
+
+        createPieces();
+    </script>
+</body>
+</html>
