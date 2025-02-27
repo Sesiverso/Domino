@@ -3,13 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominó Matemático - Ensino Fundamental II</title>
+    <title>Dominó Matemático</title>
     <style>
         body { text-align: center; font-family: Arial, sans-serif; background: #f4f4f4; }
-        #game-container { display: flex; justify-content: center; margin-top: 50px; }
-        #drop-zone { width: 140px; height: 70px; border: 2px dashed #333; display: flex; align-items: center; justify-content: center; font-size: 22px; background: white; font-weight: bold; }
-        #pieces { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        .piece { width: 120px; height: 60px; background: white; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: grab; font-weight: bold; }
+        #game-container { display: flex; justify-content: center; margin-top: 50px; position: relative; height: 200px; }
+        #drop-zone { width: 140px; height: 70px; border: 2px dashed #333; display: flex; align-items: center; justify-content: center; font-size: 22px; background: white; font-weight: bold; position: absolute; top: 50%; transform: translateY(-50%); }
+        
+        #pieces-container { 
+            width: 100%; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            padding: 10px;
+            background: #ddd;
+            margin-top: 20px;
+        }
+        
+        #pieces { 
+            display: flex; 
+            gap: 10px; 
+            justify-content: start; 
+            flex-wrap: nowrap; 
+            padding: 10px;
+        }
+
+        .piece { 
+            width: 120px; height: 60px; 
+            background: white; 
+            border: 2px solid #333; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            cursor: grab; 
+            font-weight: bold;
+            touch-action: none; /* Melhora o touch */
+        }
+
         .broken { animation: breakPiece 0.5s; }
         @keyframes breakPiece {
             0% { transform: scale(1); opacity: 1; }
@@ -21,10 +50,14 @@
 <body>
     <h1>Dominó Matemático</h1>
     <h2>Pontuação: <span id="score">0</span></h2>
+    
     <div id="game-container">
         <div id="drop-zone"></div>
     </div>
-    <div id="pieces"></div>
+    
+    <div id="pieces-container">
+        <div id="pieces"></div>
+    </div>
 
     <script>
         let score = 0;
@@ -52,11 +85,71 @@
                 piece.classList.add("piece");
                 piece.textContent = domino.resposta;
                 piece.draggable = true;
+
+                // Eventos de Drag and Drop
                 piece.addEventListener("dragstart", (e) => {
                     e.dataTransfer.setData("text", domino.resposta);
                 });
+
+                // Suporte para toque (touch)
+                piece.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    let touch = e.touches[0];
+                    piece.style.position = "absolute";
+                    piece.style.zIndex = 1000;
+
+                    function moveAt(pageX, pageY) {
+                        piece.style.left = pageX - piece.offsetWidth / 2 + "px";
+                        piece.style.top = pageY - piece.offsetHeight / 2 + "px";
+                    }
+
+                    moveAt(touch.pageX, touch.pageY);
+
+                    function onTouchMove(event) {
+                        let touch = event.touches[0];
+                        moveAt(touch.pageX, touch.pageY);
+                    }
+
+                    function onTouchEnd() {
+                        let dropRect = dropZone.getBoundingClientRect();
+                        let pieceRect = piece.getBoundingClientRect();
+
+                        if (
+                            pieceRect.left > dropRect.left &&
+                            pieceRect.right < dropRect.right &&
+                            pieceRect.top > dropRect.top &&
+                            pieceRect.bottom < dropRect.bottom
+                        ) {
+                            checkDrop(piece, domino.resposta);
+                        }
+
+                        document.removeEventListener("touchmove", onTouchMove);
+                        document.removeEventListener("touchend", onTouchEnd);
+                        piece.style.position = "static";
+                    }
+
+                    document.addEventListener("touchmove", onTouchMove);
+                    document.addEventListener("touchend", onTouchEnd);
+                });
+
                 piecesContainer.appendChild(piece);
             });
+        }
+
+        function checkDrop(piece, value) {
+            if (value === selectedDomino.resposta) {
+                score += 100;
+                dropZone.style.background = "lightgreen";
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                score -= 50;
+                dropZone.style.background = "red";
+                piece.classList.add("broken");
+                setTimeout(() => {
+                    piece.classList.remove("broken");
+                }, 500);
+            }
+            scoreDisplay.textContent = score;
         }
 
         dropZone.addEventListener("dragover", (e) => e.preventDefault());
@@ -64,22 +157,8 @@
         dropZone.addEventListener("drop", (e) => {
             e.preventDefault();
             const droppedValue = e.dataTransfer.getData("text");
-            if (droppedValue === selectedDomino.resposta) {
-                score += 100;
-                dropZone.style.background = "lightgreen";
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                score -= 50;
-                dropZone.style.background = "red";
-                let draggedPiece = document.querySelector(`.piece:contains('${droppedValue}')`);
-                if (draggedPiece) {
-                    draggedPiece.classList.add("broken");
-                    setTimeout(() => {
-                        draggedPiece.classList.remove("broken");
-                    }, 500);
-                }
-            }
-            scoreDisplay.textContent = score;
+            const piece = document.querySelector(`.piece:contains('${droppedValue}')`);
+            checkDrop(piece, droppedValue);
         });
 
         createPieces();
