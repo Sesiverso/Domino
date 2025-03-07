@@ -220,31 +220,29 @@
             });
         }
 
-        function checkDrop(piece, droppedValue) {
-            if (droppedValue === selectedDomino.resposta) {
-                score += 100;
-                dropZone.style.background = "lightgreen";
-                setTimeout(() => {
-                    if (score >= 1000) {
-                        gameOver(true); // Vitória quando alcançar 1000 pontos
-                    } else {
-                        nextQuestion(); // Gera uma nova pergunta
-                    }
-                    // Atualiza a pontuação na tela
-                    scoreDisplay.textContent = score;
-                }, 1000);
+        ffunction checkDrop(piece, droppedValue) {
+    if (droppedValue === selectedDomino.resposta) {
+        score += 100; // Somar 100 pontos ao acertar
+        dropZone.style.background = "lightgreen";
+        setTimeout(() => {
+            if (score >= 1000) {
+                gameOver(true); // Vitória quando atingir 1000 pontos
             } else {
-                score -= 50;
-                dropZone.style.background = "red";
-                piece.classList.add("broken");
-                setTimeout(() => {
-                    piece.classList.remove("broken");
-                }, 500);
-                if (score < 0) score = 0;
-                // Atualiza a pontuação na tela
-                scoreDisplay.textContent = score;
+                nextQuestion(); // Gera uma nova pergunta
             }
-        }
+            scoreDisplay.textContent = score; // Atualiza o texto de pontuação
+        }, 1000);
+    } else {
+        score -= 50; // Subtrai 50 pontos ao errar
+        if (score < 0) score = 0; // Impede a pontuação de ser negativa
+        dropZone.style.background = "red";
+        piece.classList.add("broken");
+        setTimeout(() => {
+            piece.classList.remove("broken");
+        }, 500);
+        scoreDisplay.textContent = score; // Atualiza o texto de pontuação
+    }
+}
 
         function nextQuestion() {
             // Seleciona uma nova pergunta
