@@ -230,6 +230,8 @@
                     } else {
                         nextQuestion(); // Gera uma nova pergunta
                     }
+                    // Atualiza a pontuação na tela
+                    scoreDisplay.textContent = score;
                 }, 1000);
             } else {
                 score -= 50;
@@ -239,6 +241,7 @@
                     piece.classList.remove("broken");
                 }, 500);
                 if (score < 0) score = 0;
+                // Atualiza a pontuação na tela
                 scoreDisplay.textContent = score;
             }
         }
