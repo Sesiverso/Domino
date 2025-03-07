@@ -175,45 +175,15 @@
                     e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
                 });
 
-                // Suporte para toque (touch)
-                piece.addEventListener("touchstart", (e) => {
+                // Eventos de Drag over e Drop
+                dropZone.addEventListener("dragover", (e) => {
+                    e.preventDefault(); // Permite o drop
+                });
+
+                dropZone.addEventListener("drop", (e) => {
                     e.preventDefault();
-                    let touch = e.touches[0];
-                    piece.style.position = "absolute";
-                    piece.style.zIndex = 1000;
-
-                    function moveAt(pageX, pageY) {
-                        piece.style.left = pageX - piece.offsetWidth / 2 + "px";
-                        piece.style.top = pageY - piece.offsetHeight / 2 + "px";
-                    }
-
-                    moveAt(touch.pageX, touch.pageY);
-
-                    function onTouchMove(event) {
-                        let touch = event.touches[0];
-                        moveAt(touch.pageX, touch.pageY);
-                    }
-
-                    function onTouchEnd() {
-                        let dropRect = dropZone.getBoundingClientRect();
-                        let pieceRect = piece.getBoundingClientRect();
-
-                        if (
-                            pieceRect.left > dropRect.left &&
-                            pieceRect.right < dropRect.right &&
-                            pieceRect.top > dropRect.top &&
-                            pieceRect.bottom < dropRect.bottom
-                        ) {
-                            checkDrop(piece, piece.textContent);
-                        }
-
-                        document.removeEventListener("touchmove", onTouchMove);
-                        document.removeEventListener("touchend", onTouchEnd);
-                        piece.style.position = "static";
-                    }
-
-                    document.addEventListener("touchmove", onTouchMove);
-                    document.addEventListener("touchend", onTouchEnd);
+                    const droppedValue = e.dataTransfer.getData("text");
+                    checkDrop(piece, droppedValue);
                 });
 
                 piecesContainer.appendChild(piece);
@@ -221,28 +191,28 @@
         }
 
         function checkDrop(piece, droppedValue) {
-    if (droppedValue === selectedDomino.resposta) {
-        score += 100; // Somar 100 pontos ao acertar
-        dropZone.style.background = "lightgreen";
-        setTimeout(() => {
-            if (score >= 1000) {
-                gameOver(true); // Vitória quando atingir 1000 pontos
+            if (droppedValue === selectedDomino.resposta) {
+                score += 100; // Somar 100 pontos ao acertar
+                dropZone.style.background = "lightgreen";
+                setTimeout(() => {
+                    if (score >= 1000) {
+                        gameOver(true); // Vitória quando atingir 1000 pontos
+                    } else {
+                        nextQuestion(); // Gera uma nova pergunta
+                    }
+                    scoreDisplay.textContent = score; // Atualiza o texto de pontuação
+                }, 1000);
             } else {
-                nextQuestion(); // Gera uma nova pergunta
+                score -= 50; // Subtrai 50 pontos ao errar
+                if (score < 0) score = 0; // Impede a pontuação de ser negativa
+                dropZone.style.background = "red";
+                piece.classList.add("broken");
+                setTimeout(() => {
+                    piece.classList.remove("broken");
+                }, 500);
+                scoreDisplay.textContent = score; // Atualiza o texto de pontuação
             }
-            scoreDisplay.textContent = score; // Atualiza o texto de pontuação
-        }, 1000);
-    } else {
-        score -= 50; // Subtrai 50 pontos ao errar
-        if (score < 0) score = 0; // Impede a pontuação de ser negativa
-        dropZone.style.background = "red";
-        piece.classList.add("broken");
-        setTimeout(() => {
-            piece.classList.remove("broken");
-        }, 500);
-        scoreDisplay.textContent = score; // Atualiza o texto de pontuação
-    }
-}
+        }
 
         function nextQuestion() {
             // Seleciona uma nova pergunta
