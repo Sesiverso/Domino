@@ -160,12 +160,13 @@
             { conta: "(10 ÷ 2) + (3 × 3)", respostas: ["12", "13", "14", "15"], respostaCorreta: "14" }
         ];
 
+        // Função para atualizar a questão e as alternativas
         function updateQuestion() {
-            // Mostra a pergunta atual
             dropZone.textContent = dominoes[currentQuestionIndex].conta;
             createPieces(); // Cria as peças para a pergunta
         }
 
+        // Função para criar as alternativas de respostas
         function createPieces() {
             piecesContainer.innerHTML = ''; // Limpa as peças antigas
             const currentDomino = dominoes[currentQuestionIndex];
@@ -196,11 +197,16 @@
             });
         }
 
+        // Função para verificar se a resposta está correta
         function checkDrop(piece, droppedValue) {
             const correctAnswer = dominoes[currentQuestionIndex].respostaCorreta;
 
+            // Verifica se a resposta é correta
             if (droppedValue === correctAnswer) {
-                score += 100; // Somar 100 pontos ao acertar
+                if (!piece.classList.contains("correct")) {
+                    score += 20; // Somar 20 pontos ao acertar
+                    piece.classList.add("correct"); // Marca que já foi respondido corretamente
+                }
                 if (score > 1000) score = 1000; // Limita a pontuação a 1000
                 dropZone.style.background = "lightgreen";
                 setTimeout(() => {
@@ -223,6 +229,7 @@
             }
         }
 
+        // Função para ir para a próxima questão
         function nextQuestion() {
             // Avança para a próxima pergunta
             currentQuestionIndex++;
@@ -234,6 +241,7 @@
             updateQuestion(); // Atualiza a pergunta
         }
 
+        // Função para finalizar o jogo
         function gameOver(win) {
             isGameOver = true;
             if (win) {
