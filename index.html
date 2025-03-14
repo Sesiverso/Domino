@@ -148,15 +148,16 @@
         const piecesContainer = document.getElementById("pieces");
         const winnerMessage = document.getElementById("winner-message");
 
+        // Questões com várias alternativas de respostas
         const dominoes = [
-            { conta: "2³", resposta: "8" },
-            { conta: "√49", resposta: "7" },
-            { conta: "3 × (5 - 2)", resposta: "9" },
-            { conta: "1/2 + 1/4", resposta: "3/4" },
-            { conta: "15 ÷ 3 + 2", resposta: "7" },
-            { conta: "5² - 4²", resposta: "9" },
-            { conta: "6 + 2 × 3", resposta: "12" },
-            { conta: "(10 ÷ 2) + (3 × 3)", resposta: "14" }
+            { conta: "2³", respostas: ["6", "7", "8", "9"], respostaCorreta: "8" },
+            { conta: "√49", respostas: ["6", "7", "8", "9"], respostaCorreta: "7" },
+            { conta: "3 × (5 - 2)", respostas: ["7", "8", "9", "10"], respostaCorreta: "9" },
+            { conta: "1/2 + 1/4", respostas: ["3/4", "1/3", "1/2", "1"], respostaCorreta: "3/4" },
+            { conta: "15 ÷ 3 + 2", respostas: ["5", "6", "7", "8"], respostaCorreta: "7" },
+            { conta: "5² - 4²", respostas: ["7", "8", "9", "10"], respostaCorreta: "9" },
+            { conta: "6 + 2 × 3", respostas: ["10", "11", "12", "13"], respostaCorreta: "12" },
+            { conta: "(10 ÷ 2) + (3 × 3)", respostas: ["12", "13", "14", "15"], respostaCorreta: "14" }
         ];
 
         function updateQuestion() {
@@ -168,33 +169,35 @@
         function createPieces() {
             piecesContainer.innerHTML = ''; // Limpa as peças antigas
             const currentDomino = dominoes[currentQuestionIndex];
-            const piece = document.createElement("div");
-            piece.classList.add("piece");
-            piece.textContent = currentDomino.resposta;
-            piece.draggable = true;
+            currentDomino.respostas.forEach(resposta => {
+                const piece = document.createElement("div");
+                piece.classList.add("piece");
+                piece.textContent = resposta;
+                piece.draggable = true;
 
-            // Eventos de Drag and Drop
-            piece.addEventListener("dragstart", (e) => {
-                e.dataTransfer.setData("text", currentDomino.resposta);
-                e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
+                // Eventos de Drag and Drop
+                piece.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text", resposta);
+                    e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
+                });
+
+                // Eventos de Drag over e Drop
+                dropZone.addEventListener("dragover", (e) => {
+                    e.preventDefault(); // Permite o drop
+                });
+
+                dropZone.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    const droppedValue = e.dataTransfer.getData("text");
+                    checkDrop(piece, droppedValue);
+                });
+
+                piecesContainer.appendChild(piece);
             });
-
-            // Eventos de Drag over e Drop
-            dropZone.addEventListener("dragover", (e) => {
-                e.preventDefault(); // Permite o drop
-            });
-
-            dropZone.addEventListener("drop", (e) => {
-                e.preventDefault();
-                const droppedValue = e.dataTransfer.getData("text");
-                checkDrop(piece, droppedValue);
-            });
-
-            piecesContainer.appendChild(piece);
         }
 
         function checkDrop(piece, droppedValue) {
-            const correctAnswer = dominoes[currentQuestionIndex].resposta;
+            const correctAnswer = dominoes[currentQuestionIndex].respostaCorreta;
 
             if (droppedValue === correctAnswer) {
                 score += 100; // Somar 100 pontos ao acertar
