@@ -176,7 +176,7 @@
                 piece.textContent = resposta;
                 piece.draggable = true;
 
-                // Eventos de Drag and Drop
+                // Flag para garantir que a pontuação só será somada uma vez
                 piece.addEventListener("dragstart", (e) => {
                     e.dataTransfer.setData("text", resposta);
                     e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
