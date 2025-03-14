@@ -141,6 +141,7 @@
 
     <script>
         let score = 0;
+        let currentQuestionIndex = 0;
         let isGameOver = false;
         const scoreDisplay = document.getElementById("score");
         const dropZone = document.getElementById("drop-zone");
@@ -158,67 +159,76 @@
             { conta: "(10 ÷ 2) + (3 × 3)", resposta: "14" }
         ];
 
-        let selectedDomino = dominoes[Math.floor(Math.random() * dominoes.length)];
-        dropZone.textContent = selectedDomino.conta;
+        function updateQuestion() {
+            // Mostra a pergunta atual
+            dropZone.textContent = dominoes[currentQuestionIndex].conta;
+            createPieces(); // Cria as peças para a pergunta
+        }
 
         function createPieces() {
             piecesContainer.innerHTML = ''; // Limpa as peças antigas
-            dominoes.forEach(domino => {
-                const piece = document.createElement("div");
-                piece.classList.add("piece");
-                piece.textContent = domino.resposta;
-                piece.draggable = true;
+            const currentDomino = dominoes[currentQuestionIndex];
+            const piece = document.createElement("div");
+            piece.classList.add("piece");
+            piece.textContent = currentDomino.resposta;
+            piece.draggable = true;
 
-                // Eventos de Drag and Drop
-                piece.addEventListener("dragstart", (e) => {
-                    e.dataTransfer.setData("text", domino.resposta);
-                    e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
-                });
-
-                // Eventos de Drag over e Drop
-                dropZone.addEventListener("dragover", (e) => {
-                    e.preventDefault(); // Permite o drop
-                });
-
-                dropZone.addEventListener("drop", (e) => {
-                    e.preventDefault();
-                    const droppedValue = e.dataTransfer.getData("text");
-                    checkDrop(piece, droppedValue);
-                });
-
-                piecesContainer.appendChild(piece);
+            // Eventos de Drag and Drop
+            piece.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("text", currentDomino.resposta);
+                e.target.style.zIndex = 1000; // Eleva o z-index ao arrastar
             });
+
+            // Eventos de Drag over e Drop
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault(); // Permite o drop
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                const droppedValue = e.dataTransfer.getData("text");
+                checkDrop(piece, droppedValue);
+            });
+
+            piecesContainer.appendChild(piece);
         }
 
         function checkDrop(piece, droppedValue) {
-            if (droppedValue === selectedDomino.resposta) {
+            const correctAnswer = dominoes[currentQuestionIndex].resposta;
+
+            if (droppedValue === correctAnswer) {
                 score += 100; // Somar 100 pontos ao acertar
+                if (score > 1000) score = 1000; // Limita a pontuação a 1000
                 dropZone.style.background = "lightgreen";
                 setTimeout(() => {
                     if (score >= 1000) {
                         gameOver(true); // Vitória quando atingir 1000 pontos
                     } else {
-                        nextQuestion(); // Gera uma nova pergunta
+                        nextQuestion(); // Avança para a próxima questão
                     }
                     scoreDisplay.textContent = score; // Atualiza o texto de pontuação
                 }, 1000);
             } else {
-                score -= 50; // Subtrai 50 pontos ao errar
-                if (score < 0) score = 0; // Impede a pontuação de ser negativa
+                score = 0; // Resetar a pontuação para 0 ao errar
                 dropZone.style.background = "red";
                 piece.classList.add("broken");
                 setTimeout(() => {
                     piece.classList.remove("broken");
                 }, 500);
                 scoreDisplay.textContent = score; // Atualiza o texto de pontuação
+                gameOver(false); // Game over por erro
             }
         }
 
         function nextQuestion() {
-            // Seleciona uma nova pergunta
-            selectedDomino = dominoes[Math.floor(Math.random() * dominoes.length)];
-            dropZone.textContent = selectedDomino.conta;
-            createPieces(); // Cria as peças para a nova pergunta
+            // Avança para a próxima pergunta
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex >= dominoes.length) {
+                currentQuestionIndex = dominoes.length - 1; // Impede de ir além da última questão
+            }
+
+            updateQuestion(); // Atualiza a pergunta
         }
 
         function gameOver(win) {
@@ -230,7 +240,7 @@
             }
         }
 
-        createPieces(); // Inicia o jogo
+        updateQuestion(); // Inicia o jogo com a primeira pergunta
     </script>
 </body>
 </html>
